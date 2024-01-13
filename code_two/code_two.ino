@@ -25,15 +25,21 @@ void loop() {
   unsigned short irVal1 = digitalRead(outPin1);
   unsigned short irVal2 = digitalRead(outPin2);
 
-  if(irVal1 == 0 || irVal2 == 0){
-    Serial.println("Stopping...");
+  // if(irVal1 == 0 || irVal2 == 0){
+  //   Serial.println("Stopping...");
+  // }else{
+  //   if(distance1 > 0 && distance1 < 60 || distance2 > 0 && distance2 < 60){
+  //     Serial.println("Moving Forward...");
+  //   }else{
+  //     Serial.println("Rotating...");
+  //   }
+  // }
+
+  if(irVal1 == 0){
+    Serial.println("White");
   }else{
-    if(distance1 > 0 && distance1 < 60 || distance2 > 0 && distance2 < 60){
-      Serial.println("Moving Forward...");
-    }else{
-      Serial.println("Rotating...");
-    }
+    Serial.println("Black");
   }
 
-  delay(100);
+  delay(1000);
 }
