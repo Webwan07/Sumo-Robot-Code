@@ -1,7 +1,5 @@
 #include <NewPing.h>
 #define MAX_DISTANCE 200
-#define LIMIT_DISTANCE 22
-
 const int PWMA = 5;
 const int PWMB = 5;
 const int AIN1 = 4;
@@ -37,7 +35,6 @@ void setup() {
   pinMode(back_IR, INPUT);
 
   Serial.begin(9600);
-  delay(5000);
 }
 
 void moveForward() {
@@ -81,26 +78,12 @@ void rightTurn() {
 }
 
 void loop() {
-  unsigned int leftSensor = sonar1.ping_cm();
-  unsigned int rightSensor = sonar2.ping_cm();
+  unsigned int distance1 = sonar1.ping_cm();
+  unsigned int distance2 = sonar2.ping_cm();
 
   // IR == 0 (White)
   // IR == 1 (Black)
   unsigned int leftIR = digitalRead(left_IR);
   unsigned int rightIR = digitalRead(Right_IR);
   unsigned int backIR = digitalRead(back_IR);
-
-  Serial.print("Sensor 1: ");
-  Serial.print(leftSensor);
-  Serial.print(" : Sensor 2: ");
-  Serial.println(rightSensor);
-  if (leftSensor <= LIMIT_DISTANCE && leftSensor != 0|| rightSensor <= LIMIT_DISTANCE && rightSensor != 0) {
-    moveForward();
-  } else {
-    stopMotors(); 
-    delay(1); 
-    rightTurn();  
-  }
-
-  delay(100);
 }
