@@ -1,7 +1,7 @@
 #include <NewPing.h>
-#define MAX_DISTANCE 200
-#define LIMIT_DISTANCE 22
-
+#include <Arduino.h>
+#define MAX_DISTANCE 50
+// Hulom's Group
 const int PWMA = 5;
 const int PWMB = 5;
 const int AIN1 = 4;
@@ -9,8 +9,9 @@ const int AIN2 = 6;
 const int BIN1 = 3;
 const int BIN2 = 2;
 
-const int motorSpeed = 255;
-const int motorTurnSpeed = 100;
+const int moveForwardSpeed = 255;
+const int moveBackwardSpeed = 255;
+const int motorTurnSpeed = 255;
 
 const int left_Trig = 8;
 const int left_Echo = 9;
@@ -36,7 +37,6 @@ void setup() {
   pinMode(Right_IR, INPUT);
   pinMode(back_IR, INPUT);
 
-  Serial.begin(9600);
   delay(5000);
 }
 
@@ -45,9 +45,8 @@ void moveForward() {
   digitalWrite(AIN2, LOW);
   digitalWrite(BIN1, HIGH);
   digitalWrite(BIN2, LOW);
-
-  analogWrite(PWMA, motorSpeed);
-  analogWrite(PWMB, motorSpeed);
+  analogWrite(PWMA, moveForwardSpeed);
+  analogWrite(PWMB, moveForwardSpeed);
 }
 
 void moveBackward() {
@@ -55,9 +54,8 @@ void moveBackward() {
   digitalWrite(AIN2, HIGH);
   digitalWrite(BIN1, LOW);
   digitalWrite(BIN2, HIGH);
-
-  analogWrite(PWMA, motorSpeed);
-  analogWrite(PWMB, motorSpeed);
+  analogWrite(PWMA, moveBackwardSpeed);
+  analogWrite(PWMB, moveBackwardSpeed);
 }
 
 void stopMotors() {
@@ -65,9 +63,17 @@ void stopMotors() {
   digitalWrite(AIN2, LOW);
   digitalWrite(BIN1, LOW);
   digitalWrite(BIN2, LOW);
-
   analogWrite(PWMA, 0);
   analogWrite(PWMB, 0);
+}
+
+void leftTurn() {
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, HIGH);
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, LOW);
+  analogWrite(PWMA, motorTurnSpeed);
+  analogWrite(PWMB, motorTurnSpeed);
 }
 
 void rightTurn() {
@@ -75,7 +81,6 @@ void rightTurn() {
   digitalWrite(AIN2, LOW);
   digitalWrite(BIN1, LOW);
   digitalWrite(BIN2, HIGH);
-
   analogWrite(PWMA, motorTurnSpeed);
   analogWrite(PWMB, motorTurnSpeed);
 }
@@ -83,24 +88,30 @@ void rightTurn() {
 void loop() {
   unsigned int leftSensor = sonar1.ping_cm();
   unsigned int rightSensor = sonar2.ping_cm();
-
-  // IR == 0 (White)
-  // IR == 1 (Black)
   unsigned int leftIR = digitalRead(left_IR);
   unsigned int rightIR = digitalRead(Right_IR);
   unsigned int backIR = digitalRead(back_IR);
 
-  Serial.print("Sensor 1: ");
-  Serial.print(leftSensor);
-  Serial.print(" : Sensor 2: ");
-  Serial.println(rightSensor);
-  if (leftSensor <= LIMIT_DISTANCE && leftSensor != 0|| rightSensor <= LIMIT_DISTANCE && rightSensor != 0) {
-    moveForward();
+  if (leftIR == 1 || rightIR == 1 || backIR == 1) {
+    if (leftIR == 1 || rightIR == 1) {
+      moveBackward();
+      delay(1000); 
+      stopMotors();
+      rightTurn();
+    }
+    else if (backIR == 1) {
+      moveForward();
+      delay(1000);
+      stopMotors();
+      rightTurn();
+    }
   } else {
-    stopMotors(); 
-    delay(1); 
-    rightTurn();  
+    if (leftSensor <= MAX_DISTANCE && leftSensor != 0|| rightSensor <= MAX_DISTANCE && rightSensor != 0) {
+      moveForward();
+    } else {
+      stopMotors();
+      rightTurn();
+    }
   }
-
-  delay(100);
+  delay(1);
 }
